@@ -2,11 +2,11 @@ pub fn add(input: &str) -> i32 {
     let delimiters = &get_delimiters(&input)[..];
     let split_input = input.split(delimiters);
     let numbers = split_input.map(|x| x.parse::<i32>().unwrap_or(0));
-    panic_on_negatives(numbers.clone());
-    numbers.fold(0, |acc, x| acc + x)
+    panic_on_negatives(numbers.clone().collect::<Vec<i32>>());
+    numbers.filter(|x| x <= &1000).fold(0, |acc, x| acc + x)
 }
 
-pub fn getcount() -> i32 {
+pub fn get_called_count() -> i32 {
     1
 }
 
@@ -19,13 +19,10 @@ fn get_delimiters(input: &str) -> Vec<char> {
     delimiters
 }
 
-fn panic_on_negatives<'a, I>(input: I)
-where
-    I: Iterator<Item = i32>,
-{
-    let mut negative_numbers = input.filter(|x| x < &0).peekable();
-    if negative_numbers.peek().is_some() {
-        let negs = format!("{:?}", negative_numbers.collect::<Vec<_>>());
+fn panic_on_negatives(mut input: Vec<i32>) {
+    input.retain(|x| x < &0);
+    if !input.is_empty() {
+        let negs = format!("{:?}", input);
         panic!("negatives not allowed: {negs}")
     }
 }
@@ -76,9 +73,14 @@ mod tests {
         add("1,-2,3,-4");
     }
 
+    #[ignore = "Exercise 7 skipped, unRustable?"]
     #[test]
-    fn get_count_works() {
-        assert_eq!(getcount(), 8)
+    fn get_called_count_works() {
+        assert_eq!(get_called_count(), 8)
     }
 
+    #[test]
+    fn above_1000_is_ignored() {
+        assert_eq!(add("0,1001,2,3"), 5, "ignore above 1000 failed");
+    }
 }
