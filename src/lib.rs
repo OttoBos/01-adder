@@ -1,4 +1,5 @@
 pub fn add(input: &str) -> i32 {
+    let input = find_and_replace_multi_delimiters(input);
     let delimiters = &get_delimiters(&input)[..];
     let split_input = input.split(delimiters);
     let numbers = split_input.map(|x| x.parse::<i32>().unwrap_or(0));
@@ -8,6 +9,14 @@ pub fn add(input: &str) -> i32 {
 
 pub fn get_called_count() -> i32 {
     1
+}
+
+fn find_and_replace_multi_delimiters(input: &str) -> String {
+    if !input.starts_with("//[") {
+        return input.to_string();
+    }
+    let delimiter = &input[3..input.find(']').unwrap()];
+    input.replace(delimiter, ",").replace("[,]", "")
 }
 
 fn get_delimiters(input: &str) -> Vec<char> {
@@ -82,5 +91,20 @@ mod tests {
     #[test]
     fn above_1000_is_ignored() {
         assert_eq!(add("0,1001,2,3"), 5, "ignore above 1000 failed");
+    }
+
+    #[test]
+    fn multi_char_delimiters_work() {
+        assert_eq!(add("//[***]\n1***2***3"), 6)
+    }
+
+    #[test]
+    fn multiple_delimiters_work() {
+        assert_eq!(add("//[*][#]\n1*2#3"), 6)
+    }
+
+    #[test]
+    fn multiple_multi_char_delimiters_work() {
+        assert_eq!(add("//[***][##]\n1***2##3"), 6)
     }
 }
