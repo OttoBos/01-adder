@@ -16,7 +16,7 @@ fn find_and_replace_multi_delimiters(input: &str) -> String {
         return input.to_string();
     }
     let delimiter = &input[3..input.find(']').unwrap()];
-    input.replace(delimiter, ",").replace("[,]", "")
+    find_and_replace_multi_delimiters(&input.replace(delimiter, ",").replace("[,]", ""))
 }
 
 fn get_delimiters(input: &str) -> Vec<char> {
